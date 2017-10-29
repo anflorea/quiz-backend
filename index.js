@@ -11,7 +11,7 @@ const app = express();
 const port = process.env.PORT || 8080;
 
 if (process.env.MONGODB_URI) {
-  mongoose.connect(config.production-database);
+  mongoose.connect(config.productionDatabase);
 } else {
   mongoose.connect(config.database);
 }
