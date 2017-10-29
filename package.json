@@ -4,7 +4,8 @@
   "description": "Backend for proiect colectiv",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon index.js --exec babel-node --presets es2015,stage-2",
+    "dev": "nodemon index.js --exec babel-node --presets es2015,stage-2",
+    "start": "babel-node index.js --presets es2015,stage-2",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
