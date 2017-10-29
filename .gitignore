@@ -1,5 +1,5 @@
 # Swap files
-.swp
+*.swp
 
 # Logs
 logs
