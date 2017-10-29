@@ -10,7 +10,11 @@ const app = express();
 
 const port = process.env.PORT || 8080;
 
-mongoose.connect(config.database);
+if (process.env.MONGODB_URI) {
+  mongoose.connect(config.production-database);
+} else {
+  mongoose.connect(config.database);
+}
 
 app.set('superSecret', config.secret);
 
