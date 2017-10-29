@@ -1,0 +1,26 @@
+{
+  "name": "quiz-backend",
+  "version": "1.0.0",
+  "description": "Backend for proiect colectiv",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/anflorea/quiz-backend.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/anflorea/quiz-backend/issues"
+  },
+  "homepage": "https://github.com/anflorea/quiz-backend#readme",
+  "dependencies": {
+    "body-parser": "^1.18.2",
+    "express": "^4.16.2",
+    "jsonwebtoken": "^8.1.0",
+    "mongoose": "^4.12.4",
+    "morgan": "^1.9.0"
+  }
+}
