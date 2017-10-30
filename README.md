@@ -3,6 +3,8 @@
 
 ## Development
 
+### MacOS
+
 Requires [Node.js](http://hodejs.orj/) with NPM.
 Requires [Mongodb](https://www.mongodb.com/) - Run `brew install mongodb`.
 
@@ -12,5 +14,6 @@ Requires [Mongodb](https://www.mongodb.com/) - Run `brew install mongodb`.
 * run `npm install`
 * Run `npm run dev` (or `npm start` if you want to run without nodemon)
 
+### Windows
 
-
+* Figure out if needed :)
