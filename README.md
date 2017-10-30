@@ -3,8 +3,8 @@
 
 ## Development
 
-Requires [Node.js](http://hodejs.orj/) with NPM
-Requires [Mongodb](https://www.mongodb.com/) - Run `brew install mongodb` 
+Requires [Node.js](http://hodejs.orj/) with NPM.
+Requires [Mongodb](https://www.mongodb.com/) - Run `brew install mongodb`.
 
 * Clone project
 * Install nodemon globally: `npm install -g nodemon` (only first time)
