@@ -6,6 +6,8 @@ import jwt from 'jsonwebtoken';
 import config from './config';
 import User from './app/models/user';
 
+import routeMiddleware from './app/utils/route-middleware';
+
 const app = express();
 
 const port = process.env.PORT || 8080;
@@ -71,24 +73,8 @@ app.post('/users', (req, res) => {
   });
 });
 
-app.use((req, res, next) => {
-  const token = req.headers['x-access-token'];
-
-  if (token) {
-    jwt.verify(token, app.get('superSecret'), (err, decoded) => {
-      if (err) {
-        return res.json({ success: false, message: 'Failed to authenticate token.' });
-      } else {
-        req.decoded = decoded;
-        next();
-      }
-    });
-  } else {
-    return res.status(403).send({
-      success: false,
-      message: 'No token provided.'
-    });
-  }
+app.use((req, res, next, app) => {
+  routeMiddleware(req, res, next, app);
 });
 
 app.get('/users', (req, res) => {
