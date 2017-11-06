@@ -26,17 +26,17 @@ app.use(bodyParser.json());
 
 app.use(morgan('dev'));
 
-app.post('/sign_in', (req, res) => {
+app.post('/sign_in', (req, res, next) => {
   User.findOne({
     email: req.body.email
   }, (err, user) => {
     if (err) throw err;
 
     if (!user) {
-      res.status(400).json({ success: false, message: 'Authentication failed. User not found.' });
+      res.status(401).json({'message': 'Authentication failed. Bad username/password.'});
     } else {
       if (user.password != req.body.password) {
-        res.status(400).json({ success: false, message: 'Authentication failed. Wrong password.' });
+        res.status(401).json({'message': 'Authentication failed. Bad username/password.'});
       } else {
         const payload = {
           'somedata': 'somedataaa'
@@ -47,8 +47,7 @@ app.post('/sign_in', (req, res) => {
         });
 
         res.json({
-          success: true,
-          message: 'Enjoy your token!',
+          message: 'Authentication successful!',
           token: token
         });
       }
@@ -56,22 +55,12 @@ app.post('/sign_in', (req, res) => {
   });
 });
 
-app.post('/users', (req, res) => {
-  const newUser = new User({
-    email: req.body.email,
-    password: req.body.password
-  });
-
-  newUser.save((err) => {
-    if(err) throw err;
-
-    console.log('User saved');
-    res.json({ success: true });
-  });
+app.use((req, res, next) => {
+  routeMiddleware(req, res, next, app);
 });
 
-app.use((req, res, next, app) => {
-  routeMiddleware(req, res, next, app);
+app.post('/logout', (req, res, next) => {
+  res.json({ 'message': 'Successfuly logged out!'});
 });
 
 app.use(Controllers);
@@ -79,7 +68,7 @@ app.use(Controllers);
 // catch 404 and forward to error handler
 app.use((req, res, next) => {
 
-    let err = new Error('Requested resource not found');
+    let err = new Error('Requested resource not found.');
     err.code = 404;
     next(err);
 });
@@ -93,7 +82,7 @@ app.use((err, req, res, next) => {
     }
 
     res.status(err.code || 500);
-    res.json({ code: err.code || 500, message: err.message });
+    res.json({ message: err.message });
 });
 
 app.listen(port);

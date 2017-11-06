@@ -13,4 +13,17 @@ router.get('/users', (req, res) => {
   });
 });
 
+router.post('/users', (req, res) => {
+  const newUser = new User({
+    email: req.body.email,
+    password: req.body.password
+  });
+
+  newUser.save((err) => {
+    if (err) throw err;
+
+    res.json({ message: "Sign up successful!" });
+  });
+});
+
 export default router;
