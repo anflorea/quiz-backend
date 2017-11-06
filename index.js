@@ -5,6 +5,7 @@ import mongoose from 'mongoose';
 import jwt from 'jsonwebtoken';
 import config from './config';
 import User from './app/models/user';
+import Controllers from './app/controllers'
 
 import routeMiddleware from './app/utils/route-middleware';
 
@@ -25,33 +26,28 @@ app.use(bodyParser.json());
 
 app.use(morgan('dev'));
 
-app.get('/', (req, res) => {
-  res.send(`Hello! Running on port ${port}.`);
-});
-
-app.post('/authenticate', (req, res) => {
+app.post('/sign_in', (req, res, next) => {
   User.findOne({
     email: req.body.email
   }, (err, user) => {
     if (err) throw err;
 
     if (!user) {
-      res.json({ success: false, message: 'Authentication failed. User not found.' });
+      res.status(401).json({'message': 'Authentication failed. Bad username/password.'});
     } else {
       if (user.password != req.body.password) {
-        res.json({ success: false, message: 'Authentication failed. Wrong password.' });
+        res.status(401).json({'message': 'Authentication failed. Bad username/password.'});
       } else {
         const payload = {
           'somedata': 'somedataaa'
         };
 
         const token = jwt.sign(payload, app.get('superSecret'), {
-          expiresIn: '1m'
+          expiresIn: '1 day'
         });
 
         res.json({
-          success: true,
-          message: 'Enjoy your token!',
+          message: 'Authentication successful!',
           token: token
         });
       }
@@ -59,29 +55,36 @@ app.post('/authenticate', (req, res) => {
   });
 });
 
-app.post('/users', (req, res) => {
-  const newUser = new User({
-    email: req.body.email,
-    password: req.body.password
-  });
-
-  newUser.save((err) => {
-    if(err) throw err;
-
-    console.log('User saved');
-    res.json({ success: true });
-  });
-});
-
-app.use((req, res, next, app) => {
+app.use((req, res, next) => {
   routeMiddleware(req, res, next, app);
 });
 
-app.get('/users', (req, res) => {
-  User.find({}, (err, users) => {
-    res.json(users);
-  });
+app.post('/logout', (req, res, next) => {
+  res.json({ 'message': 'Successfuly logged out!'});
+});
+
+app.use(Controllers);
+
+// catch 404 and forward to error handler
+app.use((req, res, next) => {
+
+    let err = new Error('Requested resource not found.');
+    err.code = 404;
+    next(err);
+});
+
+// error handler
+app.use((err, req, res, next) => {
+
+    if (err.name === 'UnauthorizedError') {
+        err.code = 401;
+        err.message = 'Invalid authorization token';
+    }
+
+    res.status(err.code || 500);
+    res.json({ message: err.message });
 });
 
 app.listen(port);
 console.log('Running...');
+
