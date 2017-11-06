@@ -5,7 +5,8 @@ import mongoose from 'mongoose';
 import jwt from 'jsonwebtoken';
 import config from './config';
 import User from './app/models/user';
-import Controllers from './app/controllers'
+import Controllers from './app/controllers';
+import crypto from 'crypto';
 
 import routeMiddleware from './app/utils/route-middleware';
 
@@ -28,14 +29,15 @@ app.use(morgan('dev'));
 
 app.post('/sign_in', (req, res, next) => {
   User.findOne({
-    email: req.body.email
+    username: req.body.username
   }, (err, user) => {
     if (err) throw err;
 
     if (!user) {
       res.status(401).json({'message': 'Authentication failed. Bad username/password.'});
     } else {
-      if (user.password != req.body.password) {
+      let hash = crypto.createHash('sha256').update(req.body.password).digest('base64');
+      if (user.password != hash) {
         res.status(401).json({'message': 'Authentication failed. Bad username/password.'});
       } else {
         const payload = {

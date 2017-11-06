@@ -15,8 +15,11 @@ router.get('/users', (req, res) => {
 
 router.post('/users', (req, res) => {
   const newUser = new User({
+    username: req.body.username,
     email: req.body.email,
-    password: req.body.password
+    password: req.body.password,
+    firstName: req.body.firstName,
+    lastName: req.body.lastName
   });
 
   newUser.save((err) => {
