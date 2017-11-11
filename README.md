@@ -25,7 +25,8 @@ db.users.insert({
   lastName: 'Doe',
   role: 'ADMIN'
 })
-``` (The unhashed password is `12345`)
+```
+(The unhashed password is `12345`)
 
 ### Windows
 
