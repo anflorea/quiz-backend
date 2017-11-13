@@ -18,9 +18,17 @@ router.post('/technologies', (req, res) => {
 });
 
 router.get('/technologies', (req, res) => {
-  Technology.find({}, (err, technologies) => {
+  Technology.find({}, 'id, name', (err, technologies) => {
     console.log(technologies);
     res.json(technologies);
+  });
+});
+
+router.get('/technologies/:id', (req, res) => {
+  Technology.findById(req.params.id, function(err, technology) {
+    if (err) throw err;
+
+    res.json(technology);
   });
 });
 
