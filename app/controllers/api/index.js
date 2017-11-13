@@ -30,6 +30,6 @@ router.post('/users', (req, res) => {
   });
 });
 
-router.use('', technologies);
+router.use('/technologies', technologies);
 
 export default router;

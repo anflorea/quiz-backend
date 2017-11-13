@@ -3,7 +3,7 @@ import Technology from '../../models/technology';
 
 const router = Router();
 
-router.post('/technologies', (req, res) => {
+router.post('/', (req, res) => {
   const newTechnology = new Technology({
     name: req.body.name
   });
@@ -17,14 +17,14 @@ router.post('/technologies', (req, res) => {
   });
 });
 
-router.get('/technologies', (req, res) => {
+router.get('/', (req, res) => {
   Technology.find({}, 'id, name', (err, technologies) => {
     console.log(technologies);
     res.json(technologies);
   });
 });
 
-router.get('/technologies/:id', (req, res) => {
+router.get('/:id', (req, res) => {
   Technology.findById(req.params.id, function(err, technology) {
     if (err) throw err;
 
@@ -32,7 +32,7 @@ router.get('/technologies/:id', (req, res) => {
   });
 });
 
-router.put('/technologies/:id', (req, res) => {
+router.put('/:id', (req, res) => {
   Technology.findById(req.params.id, function (err, technology) {
     if (err) throw err;
     
@@ -44,7 +44,7 @@ router.put('/technologies/:id', (req, res) => {
   });
 });
 
-router.delete('/technologies/:id', (req, res) => {
+router.delete('/:id', (req, res) => {
   // NOTE(manu): The case when there are existing questions for given technology was
   // not tested because currently questions do not exist.
   Technology.findById(req.params.id, function (err, technology) {
