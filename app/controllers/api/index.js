@@ -1,5 +1,6 @@
 import { Router } from 'express';
-import User from '../../models/user'
+import User from '../../models/user';
+import technologies from './technologies';
 
 const router = Router();
 
@@ -28,5 +29,7 @@ router.post('/users', (req, res) => {
     res.json({ message: "Sign up successful!" });
   });
 });
+
+router.use('/technologies', technologies);
 
 export default router;
