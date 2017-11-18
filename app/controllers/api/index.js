@@ -1,6 +1,5 @@
 import { Router } from 'express';
 import User from '../../models/user'
-
 const router = Router();
 
 router.get('/', (req, res) => {
@@ -12,9 +11,8 @@ router.get('/users', (req, res) => {
     res.json(users);
   });
 });
-
 router.post('/users', (req, res) => {
-  const newUser = new User({
+  const newUser = new DifficultyLevel({
     username: req.body.username,
     email: req.body.email,
     password: req.body.password,
@@ -28,5 +26,6 @@ router.post('/users', (req, res) => {
     res.json({ message: "Sign up successful!" });
   });
 });
+
 
 export default router;
