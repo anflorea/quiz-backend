@@ -1,5 +1,6 @@
 import { Router } from 'express';
-import User from '../../models/user'
+import User from '../../models/user';
+import technologies from './technologies';
 const router = Router();
 
 router.get('/', (req, res) => {
@@ -27,5 +28,6 @@ router.post('/users', (req, res) => {
   });
 });
 
+router.use('/technologies', technologies);
 
 export default router;
