@@ -27,6 +27,12 @@ app.use(bodyParser.json());
 
 app.use(morgan('dev'));
 
+app.use('/', function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "X-Requested-With");
+  next();
+ });
+
 app.post('/sign_in', (req, res, next) => {
   User.findOne({
     username: req.body.username
