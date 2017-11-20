@@ -9,7 +9,7 @@ router.get('/', (req, res) => {
   res.send(`Hello! Running...`);
 });
 
-router.user('/users', users);
+router.use('/users', users);
 
 router.use('/technologies', technologies);
 
