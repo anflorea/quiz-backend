@@ -4,20 +4,13 @@ import crypto from 'crypto';
 const Schema = mongoose.Schema;
 
 const DifficultyLevel = new Schema({
-    createdAt: Date,
-    updatedAt: Date,
     name: {
         type: String,
         trim: true,
         unique: true,
         lowercase: true
     },
-    questions:[{
-        type:ObjectId,
-        ref:'Question'
-    }]
-}, {
-    timestamps: { createdAt: 'createdAt', updatedAt: 'updatedAt' }
+    questions:[{type: Schema.Types.ObjectId, ref: 'Question'}]
 });
 
 DifficultyLevel.pre('save', function (next) {
