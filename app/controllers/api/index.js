@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import User from '../../models/user';
 import technologies from './technologies';
-
+import difficulties from './difficulties';
 const router = Router();
 
 router.get('/', (req, res) => {
@@ -13,7 +13,6 @@ router.get('/users', (req, res) => {
     res.json(users);
   });
 });
-
 router.post('/users', (req, res) => {
   const newUser = new User({
     username: req.body.username,
@@ -31,5 +30,6 @@ router.post('/users', (req, res) => {
 });
 
 router.use('/technologies', technologies);
+router.use('/difficulties', difficulties);
 
 export default router;
