@@ -14,7 +14,7 @@ router.get('/users', (req, res) => {
   });
 });
 router.post('/users', (req, res) => {
-  const newUser = new DifficultyLevel({
+  const newUser = new User({
     username: req.body.username,
     email: req.body.email,
     password: req.body.password,
