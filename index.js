@@ -28,8 +28,14 @@ app.use(bodyParser.json());
 app.use(morgan('dev'));
 
 app.use('/', function(req, res, next) {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Headers", "X-Requested-With");
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', '*');
+  res.setHeader('Access-Control-Allow-Headers', 'x-access-token');
+  if ( req.method === 'OPTIONS' ) {
+    res.writeHead(200);
+    res.end();
+    return;
+  }
   next();
  });
 
