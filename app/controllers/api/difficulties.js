@@ -3,7 +3,7 @@ import DifficultyLevel from '../../models/difficulty-level'
 const router = Router();
 
 router.get('/', (req, res) => {
-    DifficultyLevel.find({ name: {$regex : "^" + req.params.name}},'id, name', (err, difficulties) => {
+    DifficultyLevel.find({ name: {$regex : (req.query.name ? ("^" + req.query.name) : "")}},'id, name', (err, difficulties) => {
         console.log(difficulties);
         res.json(difficulties);
     });
