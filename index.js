@@ -29,7 +29,7 @@ app.use(morgan('dev'));
 
 app.use('/', function(req, res, next) {
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'x-access-token');
   if ( req.method === 'OPTIONS' ) {
     res.writeHead(200);
