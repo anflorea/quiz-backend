@@ -57,7 +57,7 @@ router.delete('/:id', (req, res) => {
       res.status(404).json({message: 'User not found.'});
   });
   User.findByIdAndRemove(req.params.id).exec();
-  res.send({message: "Technology deleted successfully"});
+  res.send({message: "User deleted successfully"});
 });
 
 export default router;
