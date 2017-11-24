@@ -18,7 +18,7 @@ router.post('/', (req, res) => {
 });
 
 router.get('/', (req, res) => {
-  Technology.find({}, 'id, name', (err, technologies) => {
+  Technology.find({ name: {$regex : (req.query.name ? ("/^" + req.query.name, "i") : "")}}, 'id, name', (err, technologies) => {
     console.log(technologies);
     res.json(technologies);
   });
