@@ -4,7 +4,13 @@ import User from '../../models/user';
 const router = Router();
 
 router.get('/', (req, res) => {
-  User.find({}, (err, users) => {
+  User.find({
+      username: {$regex : (req.query.username ? ("^" + req.query.username, "i") : "")}, 
+      email: {$regex : (req.query.email ? ("^" + req.query.email, "i") : "")},
+      firstName: {$regex : (req.query.firstName ? ("^" + req.query.firstName, "i") : "")},
+      lastName: {$regex : (req.query.lastName ? ("^" + req.query.lastName, "i") : "")},
+      role: {$regex : (req.query.role ? ("^" + req.query.role, "i") : "")}
+  }, (err, users) => {
     res.json(users);
   });
 });
