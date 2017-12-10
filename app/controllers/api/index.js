@@ -3,6 +3,8 @@ import User from '../../models/user';
 import technologies from './technologies';
 import users from './users';
 import difficulties from './difficulties';
+import questions from './questions';
+import types from './types';
 
 const router = Router();
 
@@ -14,5 +16,7 @@ router.get('/', (req, res) => {
 router.use('/users', users);
 router.use('/technologies', technologies);
 router.use('/difficulties', difficulties);
+router.use('/questions', questions);
+router.use('/types', types);
 
 export default router;
