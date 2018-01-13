@@ -6,6 +6,8 @@ import difficulties from './difficulties';
 import questions from './questions';
 import types from './types';
 import takeQuiz from './take-quiz';
+import createQuiz from './create-quiz';
+
 const router = Router();
 
 router.get('/', (req, res) => {
@@ -19,5 +21,6 @@ router.use('/difficulties', difficulties);
 router.use('/questions', questions);
 router.use('/types', types);
 royer.use('/take-quiz', takeQuiz);
+router.use('/create-quiz', createQuiz);
 
 export default router;
