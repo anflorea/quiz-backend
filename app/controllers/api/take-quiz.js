@@ -18,7 +18,7 @@ router.get('/', (req, res) => {
             var correctAnswers = question.correctAnswers;
             //nu avem scorept question asa ca o sa pun default 1
 
-            if (correctAnswers.indexOf(questionId) > -1)
+            if (correctAnswers.indexOf(questionsAnswers.getValue(questionId)) > -1)
                 computedScore += 1;
         });
 
