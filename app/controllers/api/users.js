@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import jwt from 'jsonwebtoken';
 import User from '../../models/user';
+import ErrorHandle from '../../utils/error-management'
 
 const router = Router();
 
@@ -42,20 +43,8 @@ router.post('/', (req, res) => {
 
   newUser.save((err) => {
     if (err) {
-      switch (err.name) {
-        case 'ValidationError':
-          var error = {};
-          error.message = err._message;
-          error.errors = {};
-          for (var field in err.errors) {
-            error.errors[field] = err.errors[field].message;
-          }
-          res.status(401).json(error);
-          break;
-        default:
-          res.status(401).json({message: "An error has occured."});
-          break;
-      }
+      var error = ErrorHandle(err);
+      res.status(401).json(error);
       return;
     }
 
@@ -79,21 +68,8 @@ router.put('/:id', (req, res) => {
 
     user.save(function (err, updatedUser) {
       if (err) {
-        switch (err.name) {
-          case 'ValidationError':
-            var error = {};
-            error.message = err._message;
-            error.errors = {};
-            for (var field in err.errors) {
-              console.log(err.errors[field]);
-              error.errors[field] = err.errors[field].message;
-            }
-            res.status(401).json(error);
-            break;
-          default:
-            res.status(401).json({message: "An error has occured."});
-            break;
-        }
+        var error = ErrorHandle(err);
+        res.status(401).json(error);
         return;
       }
       res.send({message: 'User updated successfully.'});

@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import Technology from '../../models/technology';
+import ErrorHandle from '../../utils/error-management'
 
 const router = Router();
 
@@ -12,21 +13,8 @@ router.post('/', (req, res) => {
 
   newTechnology.save((err) => {
     if (err) {
-      switch (err.name) {
-          case 'ValidationError':
-            var error = {};
-            error.message = err._message;
-            error.errors = {};
-            for (var field in err.errors) {
-              console.log(err.errors[field]);
-              error.errors[field] = err.errors[field].message;
-            }
-            res.status(401).json(error);
-            break;
-          default:
-            res.status(401).json({message: "An error has occured."});
-            break;
-        }
+        var error = ErrorHandle(err);
+        res.status(401).json(error);
         return;
     }
     res.json({ message: 'Technology created successfully.' });
@@ -61,21 +49,8 @@ router.put('/:id', (req, res) => {
     technology.name = req.body.name;
     technology.save(function (err, updatedTechnology) {
       if (err) {
-        switch (err.name) {
-          case 'ValidationError':
-            var error = {};
-            error.message = err._message;
-            error.errors = {};
-            for (var field in err.errors) {
-              console.log(err.errors[field]);
-              error.errors[field] = err.errors[field].message;
-            }
-            res.status(401).json(error);
-            break;
-          default:
-            res.status(401).json({message: "An error has occured."});
-            break;
-        }
+        var error = ErrorHandle(err);
+        res.status(401).json(error);
         return;
       }
       res.send({message: 'Technology updated successfully.'});
