@@ -7,11 +7,11 @@ const router = Router();
 
 router.get('/', (req, res) => {
   User.find({
-      username: {$regex : (req.query.username ? ("^" + req.query.username, "i") : "")}, 
-      email: {$regex : (req.query.email ? ("^" + req.query.email, "i") : "")},
-      firstName: {$regex : (req.query.firstName ? ("^" + req.query.firstName, "i") : "")},
-      lastName: {$regex : (req.query.lastName ? ("^" + req.query.lastName, "i") : "")},
-      role: {$regex : (req.query.role ? ("^" + req.query.role, "i") : "")}
+      username: {$regex : (req.query.username ? new RegExp("^" + req.query.username, "i") : "")}, 
+      email: {$regex : (req.query.email ? new RegExp("^" + req.query.email, "i") : "")},
+      firstName: {$regex : (req.query.firstName ? new RegExp("^" + req.query.firstName, "i") : "")},
+      lastName: {$regex : (req.query.lastName ? new RegExp("^" + req.query.lastName, "i") : "")},
+      role: {$regex : (req.query.role ? new RegExp("^" + req.query.role, "i") : "")}
   }, (err, users) => {
     if (err) {
       res.status(401).json({message: "An error has occured."});
