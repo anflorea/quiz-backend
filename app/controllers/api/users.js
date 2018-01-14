@@ -1,5 +1,7 @@
 import { Router } from 'express';
+import jwt from 'jsonwebtoken';
 import User from '../../models/user';
+import ErrorHandle from '../../utils/error-management';
 
 const router = Router();
 
@@ -11,13 +13,20 @@ router.get('/', (req, res) => {
       lastName: {$regex : (req.query.lastName ? ("^" + req.query.lastName, "i") : "")},
       role: {$regex : (req.query.role ? ("^" + req.query.role, "i") : "")}
   }, (err, users) => {
+    if (err) {
+      res.status(401).json({message: "An error has occured."});
+      return;
+    }
     res.json(users);
   });
 });
 
 router.get('/:id', (req, res) => {
   User.findById(req.params.id, function(err, user) {
-    if (err) throw err;
+    if (err) {
+      res.status(404).json({message: "User not found."});
+      return;
+    }
 
     res.json(user);
   });
@@ -33,7 +42,11 @@ router.post('/', (req, res) => {
   });
 
   newUser.save((err) => {
-    if (err) throw err;
+    if (err) {
+      var error = ErrorHandle(err);
+      res.status(401).json(error);
+      return;
+    }
 
     res.json({ message: "Sign up successful!" });
   });
@@ -41,7 +54,10 @@ router.post('/', (req, res) => {
 
 router.put('/:id', (req, res) => {
   User.findById(req.params.id, function (err, user) {
-    if (err) throw err;
+    if (err) {
+      res.status(404).json({message: "User not found."});
+      return;
+    }
     
     if (req.body.email)
       user.email = req.body.email;
@@ -49,21 +65,40 @@ router.put('/:id', (req, res) => {
       user.firstName = req.body.firstName;
     if (req.body.lastName)
       user.lastName = req.body.lastName;
+    if (req.body.role)
+      user.role = req.body.role;
 
     user.save(function (err, updatedUser) {
-      if (err) throw err;
+      if (err) {
+        var error = ErrorHandle(err);
+        res.status(401).json(error);
+        return;
+      }
       res.send({message: 'User updated successfully.'});
     });
   });
 });
 
 router.delete('/:id', (req, res) => {
+  const token = req.headers['x-access-token'];
+  var decoded = jwt.decode(token, {complete: true});
+  if (decoded.payload.role !== "ADMIN") {
+    res.status(403).json({message: "Unauthorized!"});
+    return;
+  }
   User.findById(req.params.id, function (err, user) {
-    if (err)
+    if (err) {
       res.status(404).json({message: 'User not found.'});
+      return;
+    }
+    if (decoded.payload.currentUser === user.username) {
+      res.status(401).json({message: 'You can not delete your own account!'});
+      return;
+    }
+  }).then(function() {
+    User.findByIdAndRemove(req.params.id).exec();
+    res.send({message: "User deleted successfully"});
   });
-  User.findByIdAndRemove(req.params.id).exec();
-  res.send({message: "User deleted successfully"});
 });
 
 export default router;

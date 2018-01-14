@@ -3,18 +3,26 @@ import Question from '../../models/question';
 import Technology from '../../models/technology';
 import DifficultyLevel from '../../models/difficulty-level';
 import Type from '../../models/type';
+import ErrorHandle from '../../utils/error-management';
 
 const router = Router();
 
 router.post('/', (req, res) => {
   Technology.findById(req.body.technologyId, function(err, technology) {
-    if (err) throw err;
+    if (err) {
+      res.status(404).json({message: "Technology not found."});
+      return;
+    }
     DifficultyLevel.findById(req.body.difficultyLevelId, function(err, difficultyLevel) {
-      if (err) throw err;
+      if (err) {
+        res.status(404).json({message: "Difficulty not found."});
+        return;
+      }
       Type.findById(req.body.typeId, function(err, type) {
-        if (err) throw err;
-
-        console.log(technology);
+        if (err) {
+          res.status(404).json({message: "Type not found."});
+          return;
+        }
 
         const newQuestion = new Question({
           requirements: req.body.requirements,
@@ -27,8 +35,11 @@ router.post('/', (req, res) => {
         });
 
         newQuestion.save((err) => {
-          if (err) throw err;
-          console.log('Question saved');
+          if (err) {
+            var error = ErrorHandle(err);
+            res.status(401).json(err);
+            return;
+          }
           res.json({ message: 'Question created successfully.' });
         });
       });
@@ -38,7 +49,10 @@ router.post('/', (req, res) => {
 
 router.get('/', (req, res) => {
   Question.find((err, technologies) => {
-    console.log(technologies);
+    if (err) {
+      res.status(401).json({message: "An error has occured!"});
+      return;
+    }
     res.json(technologies);
   });
 });
@@ -46,37 +60,55 @@ router.get('/', (req, res) => {
 
 router.get('/:id', (req, res) => {
   Question.findById(req.params.id, function(err, question) {
-    if (err) throw err;
+    if (err) {
+      res.status(404).json({message: "Question not found."});
+      return;
+    }
     res.json(question);
   });
 });
 
 router.put('/:id', (req, res) => {
-  console.log("Got request")
   Question.findById(req.params.id, function (err, question) {
-    if (err) throw err;
-    console.log("Got question");
+    if (err) {
+      res.status(404).json({message: "Question not found."});
+      return;
+    }
     Technology.findById(req.body.technologyId, function(err, technology) {
-      if (err) throw err;
-      console.log("Got technology");
+      if (err) {
+        res.status(404).json({message: "Technology not found."});
+        return;
+      }
       DifficultyLevel.findById(req.body.difficultyLevelId, function(err, difficultyLevel) {
-        if (err) throw err;
-        console.log("Got difficultyLevel");
+        if (err) {
+          res.status(404).json({message: "Difficulty not found."});
+          return;
+        }
         Type.findById(req.body.typeId, function(err, type) {
-          if (err) throw err;
-          console.log("Got type");
+          if (err) {
+            res.status(404).json({message: "Type not found."});
+            return;
+          }
   
-          question.requirements = req.body.requirements;
-          question.rightAnswers = req.body.rightAnswers;
-          question.wrongAnswers = req.body.wrongAnswers;
-          question.timeToAnswer = req.body.timeToAnswer;
+          if (req.body.requirements)
+            question.requirements = req.body.requirements;
+          if (req.body.rightAnswers)
+            question.rightAnswers = req.body.rightAnswers;
+          if (req.body.wrongAnswers)
+            question.wrongAnswers = req.body.wrongAnswers;
+          if (req.body.timeToAnswer)
+            question.timeToAnswer = req.body.timeToAnswer;
           question.technology = technology;
           question.difficultyLevel = difficultyLevel;
           question.type = type;
 
           question.save(function (err, updatedQuestion) {
-            if (err) throw err;
-            res.send({message: 'Question updated successfully.'});
+            if (err) {
+              var error = ErrorHandle(err);
+              res.status(401).json(error);
+              return;
+            }
+            res.json({message: 'Question updated successfully.'});
           });
         });
       });
@@ -85,8 +117,15 @@ router.put('/:id', (req, res) => {
 });
 
 router.delete('/:id', (req, res) => {
-  Question.findByIdAndRemove(req.params.id).exec();
-  res.send({message: "Question deleted successfully"});
+  Question.findById(req.params.id, function (err, question) {
+    if (err) {
+      res.status(404).json({message: "Question not found."});
+      return;
+    }
+  }).then(function() {
+    Question.findByIdAndRemove(req.params.id).exec();
+    res.json({message: "Question deleted successfully"});
+  });
 });
 
 export default router;

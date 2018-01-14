@@ -8,6 +8,7 @@ const DifficultyLevel = new Schema({
         type: String,
         trim: true,
         unique: true,
+        required: true,
         lowercase: true
     },
     questions:[{type: Schema.Types.ObjectId, ref: 'Question'}]
