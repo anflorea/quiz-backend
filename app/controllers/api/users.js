@@ -23,7 +23,7 @@ router.get('/', (req, res) => {
 
 router.get('/:id', (req, res) => {
   User.findById(req.params.id, function(err, user) {
-    if (err) {
+    if (!user) {
       res.status(404).json({message: "User not found."});
       return;
     }
@@ -54,7 +54,7 @@ router.post('/', (req, res) => {
 
 router.put('/:id', (req, res) => {
   User.findById(req.params.id, function (err, user) {
-    if (err) {
+    if (!user) {
       res.status(404).json({message: "User not found."});
       return;
     }
@@ -89,7 +89,7 @@ router.delete('/:id', (req, res) => {
     return;
   }
   User.findById(req.params.id, function (err, user) {
-    if (err) {
+    if (!user) {
       res.status(404).json({message: 'User not found.'});
       return;
     }

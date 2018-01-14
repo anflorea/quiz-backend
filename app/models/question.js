@@ -6,15 +6,14 @@ export default mongoose.model('Question', new Schema({
     requirements: {
       type: String,
       trim: true,
-      required: true
+      required: true,
+      unique: false
     },
     rightAnswers: {
-      type: [String],
-      required: true
+      type: [String]
     },
     wrongAnswers: {
-      type: [String],
-      required: true
+      type: [String]
     },
     timeToAnswer: {
       type: Number,
@@ -32,7 +31,6 @@ export default mongoose.model('Question', new Schema({
     },
     type: {
       type: Schema.Types.ObjectId, 
-      ref: 'Type',
-      required: true
+      ref: 'Type'
     }
 }));

@@ -15,7 +15,7 @@ router.get('/', (req, res) => {
 
 router.get('/:id', (req, res) => {
     DifficultyLevel.findById(req.params.id, function(err, difficulty) {
-        if (err) {
+        if (!difficulty) {
             res.status(404).json({message: "Difficulty not found."});
             return;
         }
@@ -40,7 +40,7 @@ router.post('/', (req, res) => {
 
 router.delete('/:id', (req, res) => {
     DifficultyLevel.findById(req.params.id, function (err, difficulty) {
-        if (err) {
+        if (!difficulty) {
             res.status(404).json({message: "Difficulty not found."});
             return;
         }
@@ -57,7 +57,7 @@ router.delete('/:id', (req, res) => {
 
 router.put('/:id', (req, res) => {
     DifficultyLevel.findById(req.params.id,(err,difficulty) =>{
-        if (err) {
+        if (!difficulty) {
             res.status(404).json({message: "Difficulty not found!"});
             return;
         }

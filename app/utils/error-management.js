@@ -8,6 +8,9 @@ export default function(err) {
         error.errors[field] = err.errors[field].message;
       }
       break;
+    case 'MongoError':
+      error.message = err.message;
+      break;
     default:
       error.message = "An error has occured.";
       break;

@@ -24,7 +24,7 @@ router.post('/', (req, res) => {
 router.get('/', (req, res) => {
   Technology.find({ name: {$regex : (req.query.name ? new RegExp("^" + req.query.name, "i") : "")}}, 'id, name', (err, technologies) => {
     if (err) {
-      res.status(401).json({message: "No technologies found."});
+      res.status(401).json({message: "An error has occured."});
     } else 
       res.json(technologies);
   });
@@ -32,7 +32,7 @@ router.get('/', (req, res) => {
 
 router.get('/:id', (req, res) => {
   Technology.findById(req.params.id, function(err, technology) {
-    if (err) {
+    if (!technology) {
       res.status(404).json({message: "Technology not found!"});
     } else
       res.json(technology);
@@ -41,7 +41,7 @@ router.get('/:id', (req, res) => {
 
 router.put('/:id', (req, res) => {
   Technology.findById(req.params.id, function (err, technology) {
-    if (err) {
+    if (!technology) {
       res.status(404).json({message: "Technology not found!"});
       return;
     }
@@ -62,7 +62,7 @@ router.delete('/:id', (req, res) => {
   // NOTE(manu): The case when there are existing questions for given technology was
   // not tested because currently questions do not exist.
   Technology.findById(req.params.id, function (err, technology) {
-    if (err) {
+    if (!technology) {
       res.status(404).json({message: "Technology not found."});
       return;
     }
