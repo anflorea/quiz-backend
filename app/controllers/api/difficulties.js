@@ -62,8 +62,8 @@ router.put('/:id', (req, res) => {
             res.status(404).json({message: "Difficulty not found!"});
             return;
         }
-        if (req.body.name)
-            difficulty.name = req.body.name;
+        
+        difficulty.name = req.body.name;
 
         difficulty.save((err,updatedDifficulty) => {
             if (err) {
