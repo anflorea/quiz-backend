@@ -43,7 +43,10 @@ app.post('/sign_in', (req, res, next) => {
   User.findOne({
     username: req.body.username
   }, (err, user) => {
-    if (err) throw err;
+    if (err) {
+      res.status(401).json({message: "An error occured."});
+      return;
+    }
 
     if (!user) {
       res.status(401).json({'message': 'Authentication failed. Bad username/password.'});

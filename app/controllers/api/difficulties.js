@@ -50,7 +50,6 @@ router.delete('/:id', (req, res) => {
             });
             return;
         }
-    }).then(function() {
         DifficultyLevel.findByIdAndRemove(req.params.id).exec();
         res.send({message: "Difficulty level deleted successfully"});
     });

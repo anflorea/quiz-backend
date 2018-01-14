@@ -67,6 +67,8 @@ router.put('/:id', (req, res) => {
       user.lastName = req.body.lastName;
     if (req.body.role)
       user.role = req.body.role;
+    if (req.body.password)
+      user.password = req.body.password;
 
     user.save(function (err, updatedUser) {
       if (err) {
@@ -95,7 +97,7 @@ router.delete('/:id', (req, res) => {
       res.status(401).json({message: 'You can not delete your own account!'});
       return;
     }
-  }).then(function() {
+
     User.findByIdAndRemove(req.params.id).exec();
     res.send({message: "User deleted successfully"});
   });

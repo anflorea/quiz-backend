@@ -68,8 +68,8 @@ router.delete('/:id', (req, res) => {
       res.status(424).json({
         message: 'Cannot delete type that has assigned questions'
       });
+      return;
     }
-  }).then(function() {
     Type.findByIdAndRemove(req.params.id).exec();
     res.send({message: "Type deleted successfully"});
   });
