@@ -11,13 +11,20 @@ router.get('/', (req, res) => {
       lastName: {$regex : (req.query.lastName ? ("^" + req.query.lastName, "i") : "")},
       role: {$regex : (req.query.role ? ("^" + req.query.role, "i") : "")}
   }, (err, users) => {
+    if (err) {
+      res.status(401).json({message: "An error has occured."});
+      return;
+    }
     res.json(users);
   });
 });
 
 router.get('/:id', (req, res) => {
   User.findById(req.params.id, function(err, user) {
-    if (err) throw err;
+    if (err) {
+      res.status(404).json({message: "User not found."});
+      return;
+    }
 
     res.json(user);
   });
@@ -33,7 +40,24 @@ router.post('/', (req, res) => {
   });
 
   newUser.save((err) => {
-    if (err) throw err;
+    if (err) {
+      switch (err.name) {
+        case 'ValidationError':
+          var error = {};
+          error.message = err._message;
+          error.errors = {};
+          for (var field in err.errors) {
+            console.log(err.errors[field]);
+            error.errors[field] = err.errors[field].message;
+          }
+          res.status(401).json(error);
+          break;
+        default:
+          res.status(401).json({message: "An error has occured."});
+          break;
+      }
+      return;
+    }
 
     res.json({ message: "Sign up successful!" });
   });
@@ -41,7 +65,10 @@ router.post('/', (req, res) => {
 
 router.put('/:id', (req, res) => {
   User.findById(req.params.id, function (err, user) {
-    if (err) throw err;
+    if (err) {
+      res.status(404).json({message: "User not found."});
+      return;
+    }
     
     if (req.body.email)
       user.email = req.body.email;
@@ -51,7 +78,24 @@ router.put('/:id', (req, res) => {
       user.lastName = req.body.lastName;
 
     user.save(function (err, updatedUser) {
-      if (err) throw err;
+      if (err) {
+        switch (err.name) {
+          case 'ValidationError':
+            var error = {};
+            error.message = err._message;
+            error.errors = {};
+            for (var field in err.errors) {
+              console.log(err.errors[field]);
+              error.errors[field] = err.errors[field].message;
+            }
+            res.status(401).json(error);
+            break;
+          default:
+            res.status(401).json({message: "An error has occured."});
+            break;
+        }
+        return;
+      }
       res.send({message: 'User updated successfully.'});
     });
   });
@@ -59,8 +103,10 @@ router.put('/:id', (req, res) => {
 
 router.delete('/:id', (req, res) => {
   User.findById(req.params.id, function (err, user) {
-    if (err)
+    if (err) {
       res.status(404).json({message: 'User not found.'});
+      return;
+    }
   });
   User.findByIdAndRemove(req.params.id).exec();
   res.send({message: "User deleted successfully"});
