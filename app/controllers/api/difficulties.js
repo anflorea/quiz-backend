@@ -4,7 +4,7 @@ const router = Router();
 import ErrorHandle from '../../utils/error-management';
 
 router.get('/', (req, res) => {
-    DifficultyLevel.find({ name: {$regex : (req.query.name ? ("^" + req.query.name, "i") : "")}},'id, name', (err, difficulties) => {
+    DifficultyLevel.find({ name: {$regex : (req.query.name ? new RegExp("^" + req.query.name, "i") : "")}},'id, name', (err, difficulties) => {
         if (err) {
             res.status(401).json({message: "An error occured."});
             return;

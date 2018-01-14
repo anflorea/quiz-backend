@@ -22,7 +22,7 @@ router.post('/', (req, res) => {
 });
 
 router.get('/', (req, res) => {
-  Technology.find({ name: {$regex : (req.query.name ? ("/^" + req.query.name, "i") : "")}}, 'id, name', (err, technologies) => {
+  Technology.find({ name: {$regex : (req.query.name ? new RegExp("^" + req.query.name, "i") : "")}}, 'id, name', (err, technologies) => {
     if (err) {
       res.status(401).json({message: "No technologies found."});
     } else 
