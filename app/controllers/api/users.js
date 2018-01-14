@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import jwt from 'jsonwebtoken';
 import User from '../../models/user';
-import ErrorHandle from '../../utils/error-management'
+import ErrorHandle from '../../utils/error-management';
 
 const router = Router();
 
@@ -65,6 +65,8 @@ router.put('/:id', (req, res) => {
       user.firstName = req.body.firstName;
     if (req.body.lastName)
       user.lastName = req.body.lastName;
+    if (req.body.role)
+      user.role = req.body.role;
 
     user.save(function (err, updatedUser) {
       if (err) {

@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import Type from '../../models/type';
-import ErrorHandle from '../../utils/error-management'
+import ErrorHandle from '../../utils/error-management';
 
 const router = Router();
 

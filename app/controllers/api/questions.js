@@ -3,6 +3,7 @@ import Question from '../../models/question';
 import Technology from '../../models/technology';
 import DifficultyLevel from '../../models/difficulty-level';
 import Type from '../../models/type';
+import ErrorHandle from '../../utils/error-management';
 
 const router = Router();
 
@@ -27,8 +28,11 @@ router.post('/', (req, res) => {
         });
 
         newQuestion.save((err) => {
-          if (err) throw err;
-          console.log('Question saved');
+          if (err) {
+            var error = ErrorHandle(err);
+            res.status(401).json(err);
+            return;
+          }
           res.json({ message: 'Question created successfully.' });
         });
       });
@@ -38,7 +42,10 @@ router.post('/', (req, res) => {
 
 router.get('/', (req, res) => {
   Question.find((err, technologies) => {
-    console.log(technologies);
+    if (err) {
+      res.status(401).json({message: "An error has occured!"});
+      return;
+    }
     res.json(technologies);
   });
 });
@@ -46,7 +53,10 @@ router.get('/', (req, res) => {
 
 router.get('/:id', (req, res) => {
   Question.findById(req.params.id, function(err, question) {
-    if (err) throw err;
+    if (err) {
+      res.status(404).json({message: "Question not found."});
+      return;
+    }
     res.json(question);
   });
 });
@@ -85,8 +95,15 @@ router.put('/:id', (req, res) => {
 });
 
 router.delete('/:id', (req, res) => {
-  Question.findByIdAndRemove(req.params.id).exec();
-  res.send({message: "Question deleted successfully"});
+  Question.findById(req.params.id, function (err, question) {
+    if (err) {
+      res.status(404).json({message: "Question not found."});
+      return;
+    }
+  }).then(function() {
+    Question.findByIdAndRemove(req.params.id).exec();
+    res.send({message: "Question deleted successfully"});
+  });
 });
 
 export default router;
