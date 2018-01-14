@@ -33,7 +33,7 @@ router.post('/', (req, res) => {
 router.get('/', (req, res) => {
   Type.find({ name: {$regex : (req.query.name ? ("/^" + req.query.name, "i") : "")}}, 'id, name', (err, technologies) => {
     if (err) {
-      res.status(404).json({message: "No technologies found."});
+      res.status(404).json({message: "No types found."});
     } else
       res.json(technologies);
   });
@@ -42,7 +42,7 @@ router.get('/', (req, res) => {
 router.get('/:id', (req, res) => {
   Type.findById(req.params.id, function(err, type) {
     if (err) {
-      res.status(404).json({message: "Technology not found."});
+      res.status(404).json({message: "Type not found."});
     } else
       res.json(type);
   });
@@ -51,7 +51,7 @@ router.get('/:id', (req, res) => {
 router.put('/:id', (req, res) => {
   Type.findById(req.params.id, function (err, type) {
     if (err) {
-      res.status(404).json({message: "Technology not found."});
+      res.status(404).json({message: "Type not found."});
       return;
     }
     
@@ -84,7 +84,7 @@ router.delete('/:id', (req, res) => {
   // not tested because currently questions do not exist.
   Type.findById(req.params.id, function (err, type) {
     if (err) {
-      res.status(404).json({message: "Technology not found."});
+      res.status(404).json({message: "Type not found."});
       return;
     }
     if (type.questions.length !== 0) {
