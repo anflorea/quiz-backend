@@ -5,6 +5,13 @@ import ErrorHandle from '../../utils/error-management';
 
 const router = Router();
 
+function validateRole(role) {
+  role = role.toUpperCase();
+  if (role !== "ADMIN" && role != "EXAMINEE" && role !== "HR" && role !== "RECRUITER")
+    return false;
+  return true;
+}
+
 router.get('/', (req, res) => {
   User.find({
       username: {$regex : (req.query.username ? new RegExp("^" + req.query.username, "i") : "")}, 
@@ -41,6 +48,13 @@ router.post('/', (req, res) => {
     lastName: req.body.lastName
   });
 
+  if (req.body.role) {
+    if (!validateRole(req.body.role)) {
+      res.status(401).json({message: "Role field must be one of: ADMIN, HR, RECRUITER, EXAMINEE"});
+      return;
+    }
+  }
+
   newUser.save((err) => {
     if (err) {
       var error = ErrorHandle(err);
@@ -58,6 +72,13 @@ router.put('/:id', (req, res) => {
       res.status(404).json({message: "User not found."});
       return;
     }
+
+    if (req.body.role) {
+      if (!validateRole(req.body.role)) {
+        res.status(401).json({message: "Role field must be one of: ADMIN, HR, RECRUITER, EXAMINEE"});
+        return;
+      }
+    }
     
     if (req.body.email)
       user.email = req.body.email;
@@ -66,7 +87,7 @@ router.put('/:id', (req, res) => {
     if (req.body.lastName)
       user.lastName = req.body.lastName;
     if (req.body.role)
-      user.role = req.body.role;
+      user.role = req.body.role.toUpperCase();
     if (req.body.password)
       user.password = req.body.password;
 

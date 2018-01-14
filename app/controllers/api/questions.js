@@ -30,14 +30,13 @@ router.post('/', (req, res) => {
           wrongAnswers: req.body.wrongAnswers,
           timeToAnswer: req.body.timeToAnswer,
           technology: technology,
-          difficultyLevel: difficultyLevel,
-          type: type
+          difficultyLevel: difficultyLevel
         });
 
         newQuestion.save((err) => {
           if (err) {
             var error = ErrorHandle(err);
-            res.status(401).json(err);
+            res.status(401).json(error);
             return;
           }
           res.json({ message: 'Question created successfully.' });
@@ -100,7 +99,7 @@ router.put('/:id', (req, res) => {
             question.timeToAnswer = req.body.timeToAnswer;
           question.technology = technology;
           question.difficultyLevel = difficultyLevel;
-          question.type = type;
+          // question.type = type;
 
           question.save(function (err, updatedQuestion) {
             if (err) {
