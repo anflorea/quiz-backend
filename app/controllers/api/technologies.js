@@ -72,7 +72,6 @@ router.delete('/:id', (req, res) => {
       });
       return;
     }
-  }).then(function() {
     Technology.findByIdAndRemove(req.params.id).exec();
     res.send({message: "Technology deleted successfully"});
   });

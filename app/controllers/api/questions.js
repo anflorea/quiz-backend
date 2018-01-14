@@ -122,7 +122,6 @@ router.delete('/:id', (req, res) => {
       res.status(404).json({message: "Question not found."});
       return;
     }
-  }).then(function() {
     Question.findByIdAndRemove(req.params.id).exec();
     res.json({message: "Question deleted successfully"});
   });
