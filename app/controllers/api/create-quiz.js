@@ -27,7 +27,8 @@ router.post('/', (req, res) => {
     technology: req.body.technologyId
   }).exec(function(err, questions) {
     if (questions.length === 0) {
-      res.send({message: "Could not find questions with given difficulty & technology."});
+      res.status(401).json({message: "Could not find questions with given difficulty & technology."});
+      return;
     }
 
     shuffle(questions);
@@ -45,14 +46,15 @@ router.post('/', (req, res) => {
     }
 
     if (quizQuestions.length === 0) {
-      res.send({message: "We could not create quiz with that amount of timeToAnswer now. You can try again or give a higher number for timeToAnswer."})
+      res.status(401).json({message: "We could not create quiz with that amount of timeToAnswer now. You can try again or give a higher number for timeToAnswer."});
+      return;
     }
 
     const newQuiz = new Quiz({
       questions: quizQuestions,
       timeToAnswer: req.body.timeToAnswer
     });
-    res.send(newQuiz);
+    res.json(newQuiz);
   });
 });
 export default router;
