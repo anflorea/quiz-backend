@@ -53,7 +53,8 @@ app.post('/sign_in', (req, res, next) => {
         res.status(401).json({'message': 'Authentication failed. Bad username/password.'});
       } else {
         const payload = {
-          'somedata': 'somedataaa'
+          'role': user.role,
+          'currentUser': user.username
         };
 
         const token = jwt.sign(payload, app.get('superSecret'), {

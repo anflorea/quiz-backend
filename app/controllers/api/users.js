@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import jwt from 'jsonwebtoken';
 import User from '../../models/user';
 
 const router = Router();
@@ -47,7 +48,6 @@ router.post('/', (req, res) => {
           error.message = err._message;
           error.errors = {};
           for (var field in err.errors) {
-            console.log(err.errors[field]);
             error.errors[field] = err.errors[field].message;
           }
           res.status(401).json(error);
@@ -102,14 +102,25 @@ router.put('/:id', (req, res) => {
 });
 
 router.delete('/:id', (req, res) => {
+  const token = req.headers['x-access-token'];
+  var decoded = jwt.decode(token, {complete: true});
+  if (decoded.payload.role !== "ADMIN") {
+    res.status(403).json({message: "Unauthorized!"});
+    return;
+  }
   User.findById(req.params.id, function (err, user) {
     if (err) {
       res.status(404).json({message: 'User not found.'});
       return;
     }
+    if (decoded.payload.currentUser === user.username) {
+      res.status(401).json({message: 'You can not delete your own account!'});
+      return;
+    }
+  }).then(function() {
+    User.findByIdAndRemove(req.params.id).exec();
+    res.send({message: "User deleted successfully"});
   });
-  User.findByIdAndRemove(req.params.id).exec();
-  res.send({message: "User deleted successfully"});
 });
 
 export default router;
