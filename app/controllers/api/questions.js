@@ -47,18 +47,18 @@ router.post('/', (req, res) => {
 });
 
 router.get('/', (req, res) => {
-  Question.find((err, technologies) => {
+  Question.find().populate('technology', 'name').populate('difficultyLevel', 'name').exec((err, questions) => {
     if (err) {
       res.status(401).json({message: "An error has occured!"});
       return;
     }
-    res.json(technologies);
+    res.json(questions);
   });
 });
 
 
 router.get('/:id', (req, res) => {
-  Question.findById(req.params.id, function(err, question) {
+  Question.findById(req.params.id).populate('technology', 'name').populate('difficultyLevel', 'name').exec(function(err, question) {
     if (!question) {
       res.status(404).json({message: "Question not found."});
       return;
