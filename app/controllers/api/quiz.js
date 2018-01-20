@@ -91,7 +91,7 @@ router.post('/take/:id', (req, res) => {
 });
 
 router.get('/take/:id', (req, res) => {
-  Quiz.findById(req.params.id).populate('assignee', 'username').exec((err, quiz) => {
+  Quiz.findById(req.params.id).populate('assignee', 'username').populate('questions').exec((err, quiz) => {
     if (err) {
       res.status(401).json({message: "An error has occured."});
       return;
@@ -122,11 +122,37 @@ router.get('/take/:id', (req, res) => {
         if (err) {
           res.status(401).json({message: "An error has occured."});
         } else {
-          res.status(401).json({message: "This quizes time is over."});
+          res.status(401).json({message: "This quiz's time is over."});
         }
       });
     } else {
-      res.json(quiz);
+      let questions = []
+      for (var i in quiz.questions) {
+        let question = quiz.questions[i];
+        if (question.requirements) {
+          let answers = []
+          for (var j = 0; j < question.rightAnswers.length; j++) {
+            answers.push(question.rightAnswers[j])
+          }
+          for (var j = 0; j < question.wrongAnswers.length; j++) {
+            answers.push(question.wrongAnswers[j])
+          }
+          shuffle(answers);
+          let oneQuestion = {
+            _id: question._id,
+            requirements: question.requirements,
+            answers: answers
+          }
+          questions.push(oneQuestion)
+        }
+      }
+      let obfusatedQuiz = {
+        _id: quiz._id,
+        questions: questions,
+        timeToAnswer: quiz.timeToAnswer,
+        assignee: quiz.assignee
+      };
+      res.json(obfusatedQuiz);
     }
   });
 });
