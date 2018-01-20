@@ -53,6 +53,11 @@ router.post('/take/:id', (req, res) => {
 
 });
 
+// 
+router.get('/take/:id', (req, res) => {
+
+});
+
 // This route should mark the quiz with the given id as completed and compute the score for the quiz
 router.post('/submit/:id', (req, res) => {
 
