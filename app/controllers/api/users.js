@@ -2,6 +2,7 @@ import { Router } from 'express';
 import jwt from 'jsonwebtoken';
 import User from '../../models/user';
 import ErrorHandle from '../../utils/error-management';
+import getPayload from '../../utils/payload';
 
 const router = Router();
 
@@ -19,7 +20,7 @@ router.get('/', (req, res) => {
       firstName: {$regex : (req.query.firstName ? new RegExp("^" + req.query.firstName, "i") : "")},
       lastName: {$regex : (req.query.lastName ? new RegExp("^" + req.query.lastName, "i") : "")},
       role: {$regex : (req.query.role ? new RegExp("^" + req.query.role, "i") : "")}
-  }, (err, users) => {
+  }).select('-password').exec((err, users) => {
     if (err) {
       res.status(401).json({message: "An error has occured."});
       return;
@@ -28,8 +29,16 @@ router.get('/', (req, res) => {
   });
 });
 
+router.get('/mine', (req, res) => {
+  const decoded = getPayload(req);
+
+  User.findById(decoded.payload.currentId).select('-password').exec((err, user) => {
+    res.json(user);
+  });
+});
+
 router.get('/:id', (req, res) => {
-  User.findById(req.params.id, function(err, user) {
+  User.findById(req.params.id).select('-password').exec((err, user) => {
     if (!user) {
       res.status(404).json({message: "User not found."});
       return;
@@ -74,6 +83,11 @@ router.put('/:id', (req, res) => {
       return;
     }
 
+    if (user.role === "OWNER") {
+      res.status(401).json({message: "You can not update the owner's data."});
+      return;
+    }
+
     if (req.body.role) {
       if (!validateRole(req.body.role)) {
         res.status(401).json({message: "Role field must be one of: ADMIN, HR, RECRUITER, EXAMINEE"});
@@ -104,15 +118,19 @@ router.put('/:id', (req, res) => {
 });
 
 router.delete('/:id', (req, res) => {
-  const token = req.headers['x-access-token'];
-  var decoded = jwt.decode(token, {complete: true});
-  if (decoded.payload.role !== "ADMIN") {
+  var decoded = getPayload(req);
+
+  if (decoded.payload.role !== "ADMIN" && decoded.payload.role !== "OWNER") {
     res.status(403).json({message: "Unauthorized!"});
     return;
   }
   User.findById(req.params.id, function (err, user) {
     if (!user) {
       res.status(404).json({message: 'User not found.'});
+      return;
+    }
+    if (user.role === "OWNER") {
+      res.status(401).json({message: 'You can not delete an OWNER account.'});
       return;
     }
     if (decoded.payload.currentUser === user.username) {

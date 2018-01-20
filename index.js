@@ -58,7 +58,7 @@ app.post('/sign_in', (req, res, next) => {
         const payload = {
           'role': user.role,
           'currentUser': user.username,
-          'currentId': user._id
+          'currentId': user.id
         };
 
         const token = jwt.sign(payload, app.get('superSecret'), {
