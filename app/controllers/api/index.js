@@ -5,7 +5,7 @@ import users from './users';
 import difficulties from './difficulties';
 import questions from './questions';
 import types from './types';
-import createQuiz from './create-quiz';
+import quiz from './quiz';
 import mocks from './mocks';
 
 const router = Router();
@@ -20,7 +20,7 @@ router.use('/technologies', technologies);
 router.use('/difficulties', difficulties);
 router.use('/questions', questions);
 router.use('/types', types);
-router.use('/create-quiz', createQuiz);
+router.use('/quiz', quiz);
 router.use('/mocks', mocks);
 
 export default router;

@@ -103,7 +103,7 @@ router.put('/:id', (req, res) => {
       user.lastName = req.body.lastName;
     if (req.body.role)
       user.role = req.body.role.toUpperCase();
-    if (req.body.password)
+    if (req.body.password && req.body.password.length > 0)
       user.password = req.body.password;
 
     user.save(function (err, updatedUser) {
