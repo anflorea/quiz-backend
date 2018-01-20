@@ -20,7 +20,7 @@ router.get('/', (req, res) => {
       firstName: {$regex : (req.query.firstName ? new RegExp("^" + req.query.firstName, "i") : "")},
       lastName: {$regex : (req.query.lastName ? new RegExp("^" + req.query.lastName, "i") : "")},
       role: {$regex : (req.query.role ? new RegExp("^" + req.query.role, "i") : "")}
-  }, (err, users) => {
+  }).select('-password').exec((err, users) => {
     if (err) {
       res.status(401).json({message: "An error has occured."});
       return;
@@ -32,13 +32,13 @@ router.get('/', (req, res) => {
 router.get('/mine', (req, res) => {
   const decoded = getPayload(req);
 
-  User.findById(decoded.payload.currentId, (err, user) => {
+  User.findById(decoded.payload.currentId).select('-password').exec((err, user) => {
     res.json(user);
   });
 });
 
 router.get('/:id', (req, res) => {
-  User.findById(req.params.id, function(err, user) {
+  User.findById(req.params.id).select('-password').exec((err, user) => {
     if (!user) {
       res.status(404).json({message: "User not found."});
       return;
