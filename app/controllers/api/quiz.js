@@ -150,7 +150,8 @@ router.get('/take/:id', (req, res) => {
         _id: quiz._id,
         questions: questions,
         timeToAnswer: quiz.timeToAnswer,
-        assignee: quiz.assignee
+        assignee: quiz.assignee,
+        startTimestamp: quiz.startTimestamp
       };
       res.json(obfusatedQuiz);
     }
@@ -191,9 +192,33 @@ router.post('/submit/:id', (req, res) => {
     } else {
       quiz.completed = true;
 
-      // TODO: Compute the score
-      quiz.score = 1;
+      let score = 0;
 
+      for (var i = 0; i < req.body.length; i++) {
+        let question = req.body[i];
+
+        var quizQuestion;
+
+        for (var j = 0; j < quiz.questions.length; j++) {
+          if (quiz.questions[j].id === question.id) {
+            quizQuestion = quiz.questions[j];
+            break;
+          }
+        }
+
+        var correct = 0;
+
+        if (question.answers.length === quizQuestion.rightAnswers.length) {
+          for (var j = 0; j < question.answers.length; j++) {
+            if (quizQuestion.rightAnswers.indexOf(question.answers[j]) > -1)
+              correct += 1;
+          }
+          if (correct === question.answers.length)
+            score += 1;
+        }
+      }
+
+      quiz.score = Math.round((score / quiz.questions.length) * 100);
 
       quiz.save((err) => {
         if (err) {
