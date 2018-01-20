@@ -27,7 +27,7 @@ router.post('/', (req, res) => {
         const newQuestion = new Question({
           requirements: req.body.requirements,
           rightAnswers: req.body.rightAnswers,
-          wrongAnswers: req.body.wrongAnswers,
+          wrongAnswers: req.body.wrongAnswers, 
           timeToAnswer: req.body.timeToAnswer,
           technology: technology,
           difficultyLevel: difficultyLevel
