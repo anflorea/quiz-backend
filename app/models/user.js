@@ -23,7 +23,9 @@ const User = new Schema({
   },
   password: {
     type: String,
-    required: true
+    required: true,
+    min: [5, 'Password must have at least 5 characters'],
+    max: [30, 'Password can not be longer than 30 characters']
   },
   firstName: {
     type: String,

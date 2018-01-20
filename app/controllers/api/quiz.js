@@ -5,6 +5,7 @@ import Technology from '../../models/technology';
 import DifficultyLevel from '../../models/difficulty-level';
 import Quiz from '../../models/quiz';
 import ErrorHandle from '../../utils/error-management';
+import getPayload from '../../utils/payload';
 
 const router = Router();
 
@@ -24,7 +25,7 @@ function shuffle(array) {
 }
 
 router.get('/', (req, res) => {
-  Quiz.find().exec((err, quizes) => {
+  Quiz.find().populate('assignee', 'username firstName lastName email role').exec((err, quizes) => {
     if (err) {
       res.status(401).json({message: "An error has occured."});
       return;
@@ -33,34 +34,36 @@ router.get('/', (req, res) => {
   });
 });
 
-// TODO: This route should return all the quizes that the currently logged in user is assigned to
 router.get('/mine', (req, res) => {
-  Quiz.find().exec((err, quizes) => {
-    if (err) {
-      res.status(401).json({message: "An error has occured"});
-      return;
-    }
-    if (quizes.length === 0) {
-      res.json({message: "You do not have any quizzes assigned."});
-      return;
-    }
-    res.json(quizes);
+  const decoded = getPayload(req);
+  User.findById(decoded.payload.currentId).exec((err, user) => {
+    Quiz.find({assignee: user}).select('-questions').exec((err, quizes) => {
+      if (err) {
+        res.status(401).json({message: "An error has occured"});
+        return;
+      }
+      if (quizes.length === 0) {
+        res.json({message: "You do not have any quizzes assigned."});
+        return;
+      }
+      res.json(quizes);
+    });
   });
 });
 
 // TODO: This route should return the quiz with the given id
 router.post('/take/:id', (req, res) => {
-
+  res.json({message: "Work in progress."});
 });
 
 // 
 router.get('/take/:id', (req, res) => {
-
+  res.json({message: "Work in progress."});
 });
 
 // This route should mark the quiz with the given id as completed and compute the score for the quiz
 router.post('/submit/:id', (req, res) => {
-
+  res.json({message: "Work in progress."});
 });
 
 router.post('/create', (req, res) => {
@@ -78,13 +81,18 @@ router.post('/create', (req, res) => {
       return;
     }
 
-    User.findById(req.params.examineeId, function(err, user) {
+    User.findById(req.body.examineeId, function(err, user) {
       if (err) {
         res.status(401).json({message: "An error has occured."});
         return;
       }
       if (!user) {
         res.status(404).json({message: "User not found."});
+        return;
+      }
+
+      if (user.role !== "EXAMINEE") {
+        res.status(401).json({message: "You can only assign an EXAMINEE to a quiz."});
         return;
       }
 
@@ -119,7 +127,7 @@ router.post('/create', (req, res) => {
           res.status(401).json(error);
           return;
         }
-        res.json(newQuiz);
+        res.json({message: "Quiz created successfuly"});
       });
     });
   });

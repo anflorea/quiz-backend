@@ -23,5 +23,8 @@ export default mongoose.model('Quiz', new Schema({
     },
     score: {
       type: Number
+    },
+    startTimestamp: {
+      type: Date
     }
 }));
