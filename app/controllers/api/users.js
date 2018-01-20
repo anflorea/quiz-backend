@@ -2,6 +2,7 @@ import { Router } from 'express';
 import jwt from 'jsonwebtoken';
 import User from '../../models/user';
 import ErrorHandle from '../../utils/error-management';
+import getPayload from '../../utils/payload';
 
 const router = Router();
 
@@ -25,6 +26,14 @@ router.get('/', (req, res) => {
       return;
     }
     res.json(users);
+  });
+});
+
+router.get('/mine', (req, res) => {
+  const decoded = getPayload(req);
+
+  User.findById(decoded.payload.currentId, (err, user) => {
+    res.json(user);
   });
 });
 
@@ -109,9 +118,9 @@ router.put('/:id', (req, res) => {
 });
 
 router.delete('/:id', (req, res) => {
-  const token = req.headers['x-access-token'];
-  var decoded = jwt.decode(token, {complete: true});
-  if (decoded.payload.role !== "ADMIN") {
+  var decoded = getPayload(req);
+
+  if (decoded.payload.role !== "ADMIN" && decoded.payload.role !== "OWNER") {
     res.status(403).json({message: "Unauthorized!"});
     return;
   }
