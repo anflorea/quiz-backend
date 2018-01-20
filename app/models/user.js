@@ -25,7 +25,7 @@ const User = new Schema({
     type: String,
     required: true,
     min: [5, 'Password must have at least 5 characters'],
-    max: [30, 'Password can not be longer than 30 characters']
+    max: [15, 'Password can not be longer than 15 characters']
   },
   firstName: {
     type: String,
@@ -49,7 +49,8 @@ const User = new Schema({
 User.pre('save', function (next) {
   var user = this;
 
-  console.log(user);
+  if (user.password.length > 15)
+    next();
 
   let hash = crypto.createHash('sha256').update(user.password).digest('base64');
   this.password = hash;
