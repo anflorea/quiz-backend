@@ -4,6 +4,7 @@ import Technology from '../../models/technology';
 import DifficultyLevel from '../../models/difficulty-level';
 import Type from '../../models/type';
 import ErrorHandle from '../../utils/error-management';
+import getPayload from '../../utils/payload';
 
 const router = Router();
 
