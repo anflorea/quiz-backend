@@ -74,6 +74,11 @@ router.put('/:id', (req, res) => {
       return;
     }
 
+    if (user.role === "OWNER") {
+      res.status(401).json({message: "You can not update the owner's data."});
+      return;
+    }
+
     if (req.body.role) {
       if (!validateRole(req.body.role)) {
         res.status(401).json({message: "Role field must be one of: ADMIN, HR, RECRUITER, EXAMINEE"});
@@ -113,6 +118,10 @@ router.delete('/:id', (req, res) => {
   User.findById(req.params.id, function (err, user) {
     if (!user) {
       res.status(404).json({message: 'User not found.'});
+      return;
+    }
+    if (user.role === "OWNER") {
+      res.status(401).json({message: 'You can not delete an OWNER account.'});
       return;
     }
     if (decoded.payload.currentUser === user.username) {
