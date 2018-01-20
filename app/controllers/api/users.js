@@ -14,6 +14,11 @@ function validateRole(role) {
 }
 
 router.get('/', (req, res) => {
+  const decoded = getPayload(req);
+  if (decoded.payload.role === "EXAMINEE") {
+    res.status(403).json({message: "You don't have access to that resource."});
+    return;
+  }
   User.find({
       username: {$regex : (req.query.username ? new RegExp("^" + req.query.username, "i") : "")}, 
       email: {$regex : (req.query.email ? new RegExp("^" + req.query.email, "i") : "")},
@@ -38,6 +43,11 @@ router.get('/mine', (req, res) => {
 });
 
 router.get('/:id', (req, res) => {
+  const decoded = getPayload(req);
+  if (decoded.payload.role === "EXAMINEE") {
+    res.status(403).json({message: "You don't have access to that resource."});
+    return;
+  }
   User.findById(req.params.id).select('-password').exec((err, user) => {
     if (!user) {
       res.status(404).json({message: "User not found."});
@@ -49,6 +59,11 @@ router.get('/:id', (req, res) => {
 });
 
 router.post('/', (req, res) => {
+  const decoded = getPayload(req);
+  if (decoded.payload.role === "EXAMINEE") {
+    res.status(403).json({message: "You don't have access to that resource."});
+    return;
+  }
   const newUser = new User({
     username: req.body.username,
     email: req.body.email,
@@ -77,6 +92,11 @@ router.post('/', (req, res) => {
 });
 
 router.put('/:id', (req, res) => {
+  const decoded = getPayload(req);
+  if (decoded.payload.role === "EXAMINEE") {
+    res.status(403).json({message: "You don't have access to that resource."});
+    return;
+  }
   User.findById(req.params.id, function (err, user) {
     if (!user) {
       res.status(404).json({message: "User not found."});
@@ -118,7 +138,11 @@ router.put('/:id', (req, res) => {
 });
 
 router.delete('/:id', (req, res) => {
-  var decoded = getPayload(req);
+  const decoded = getPayload(req);
+  if (decoded.payload.role === "EXAMINEE") {
+    res.status(403).json({message: "You don't have access to that resource."});
+    return;
+  }
 
   if (decoded.payload.role !== "ADMIN" && decoded.payload.role !== "OWNER") {
     res.status(403).json({message: "Unauthorized!"});
