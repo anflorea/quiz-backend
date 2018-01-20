@@ -25,7 +25,7 @@ function shuffle(array) {
 }
 
 router.get('/', (req, res) => {
-  const decoded = getPayload(req)
+  const decoded = getPayload(req);
   if (decoded.payload.role === "EXAMINEE") {
     res.status(403).json({message: "You don't have access to that resource."});
     return;
@@ -157,9 +157,57 @@ router.get('/take/:id', (req, res) => {
   });
 });
 
-// This route should mark the quiz with the given id as completed and compute the score for the quiz
 router.post('/submit/:id', (req, res) => {
-  res.json({message: "Work in progress."});
+  const decoded = getPayload(req)
+  Quiz.findById(req.params.id).populate('assignee').populate('questions').exec((err, quiz) => {
+    if (err) {
+      res.status(401).json({message: "An error has occured."});
+      return;
+    }
+    if (!quiz) {
+      res.status(404).json({message: "Requested quiz not found!"});
+      return;
+    }
+    if (quiz.assignee.id !== decoded.payload.currentId) {
+      res.status(401).json({message: "This quiz is not yours!"});
+      return;
+    }
+    if (quiz.completed === true) {
+      res.status(401).json({message: "This quiz was already submitted."});
+      return;
+    }
+    const currentDate = new Date();
+    const timeDifference = Math.round(Math.abs((currentDate.getTime() - quiz.startTimestamp.getTime()) / 1000));
+    if (timeDifference > quiz.timeToAnswer + 60) {
+      quiz.completed = true;
+      quiz.score = 0;
+      quiz.save((err) => {
+        if (err) {
+          res.status(401).json({message: "An error has occured."});
+        } else {
+          res.status(401).json({message: "This quiz was not subbmited on time. Please contact HR for more info."});
+        }
+      });
+    } else {
+      quiz.completed = true;
+
+      // TODO: Compute the score
+      quiz.score = 1;
+
+
+      quiz.save((err) => {
+        if (err) {
+          res.status(401).json({message: "An error has occured."});
+        } else {
+          res.json({
+            message: "Quiz submitted with success! You scored: " + quiz.score,
+            success: true,
+            score: quiz.score
+          });
+        }
+      });
+    }
+  });
 });
 
 router.post('/create', (req, res) => {
