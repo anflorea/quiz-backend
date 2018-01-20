@@ -23,9 +23,7 @@ const User = new Schema({
   },
   password: {
     type: String,
-    required: true,
-    min: [5, 'Password must have at least 5 characters'],
-    max: [15, 'Password can not be longer than 15 characters']
+    required: true
   },
   firstName: {
     type: String,
@@ -45,6 +43,10 @@ const User = new Schema({
 }, {
     timestamps: { createdAt: 'createdAt', updatedAt: 'updatedAt' }
 });
+
+User.path('password').validate(function (v) {
+  return v.length > 5 && v.length < 15;
+}, 'Password must be between 5 and 15 characters!');
 
 User.pre('save', function (next) {
   var user = this;
