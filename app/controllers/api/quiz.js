@@ -25,7 +25,12 @@ function shuffle(array) {
 }
 
 router.get('/', (req, res) => {
-  Quiz.find().populate('assignee', 'username firstName lastName email role').exec((err, quizes) => {
+  const decoded = getPayload(req)
+  if (decoded.payload.role === "EXAMINEE") {
+    res.status(403).json({message: "You don't have access to that resource."});
+    return;
+  }
+  Quiz.find().populate('assignee', 'username firstName lastName email role').populate('questions', 'requirements').exec((err, quizes) => {
     if (err) {
       res.status(401).json({message: "An error has occured."});
       return;
@@ -51,14 +56,105 @@ router.get('/mine', (req, res) => {
   });
 });
 
-// TODO: This route should return the quiz with the given id
 router.post('/take/:id', (req, res) => {
-  res.json({message: "Work in progress."});
+  Quiz.findById(req.params.id).populate('assignee').exec((err, quiz) => {
+    if (err) {
+      res.status(401).json({message: "An error has occured."});
+      return;
+    }
+    if (!quiz) {
+      res.status(404).json({message: "Requested quiz was not found."});
+      return;
+    }
+    const decoded = getPayload(req);
+    if (quiz.assignee.id != decoded.payload.currentId) {
+      res.status(401).json({message: "You can only start quizzes that are assigned to you!"});
+      return;
+    }
+    if (quiz.completed === true) {
+      res.status(401).json({message: "You can not take an alreay completed quiz!"});
+      return;
+    }
+    if (quiz.startTimestamp) {
+      res.status(401).json({message: "This quiz was already started."});
+      return;
+    }
+    quiz.startTimestamp = new Date;
+    quiz.save((err) => {
+      if (err) {
+        res.status(401).json({message: "Unable to start quiz. An error has occured."});
+      } else {
+        res.json({message: "Quiz started successfuly"});
+      }
+    });
+  });
 });
 
-// 
 router.get('/take/:id', (req, res) => {
-  res.json({message: "Work in progress."});
+  Quiz.findById(req.params.id).populate('assignee', 'username').populate('questions').exec((err, quiz) => {
+    if (err) {
+      res.status(401).json({message: "An error has occured."});
+      return;
+    }
+    if (!quiz) {
+      res.status(404).json({message: "Requested quiz was not found."});
+      return;
+    }
+    const decoded = getPayload(req);
+    if (quiz.assignee.id != decoded.payload.currentId) {
+      res.status(401).json({message: "You can only take quizzes that are assigned to you!"});
+      return;
+    }
+    if (quiz.completed === true) {
+      res.status(401).json({message: "You can not take an alreay completed quiz!"});
+      return;
+    }
+    if (!quiz.startTimestamp) {
+      res.status(401).json({message: "This quiz was not started yet.", started: false});
+      return;
+    }
+    const currentDate = new Date();
+    const timeDifference = Math.round(Math.abs((currentDate.getTime() - quiz.startTimestamp.getTime()) / 1000));
+    if (timeDifference > quiz.timeToAnswer + 60) {
+      quiz.completed = true;
+      quiz.score = 0;
+      quiz.save((err) => {
+        if (err) {
+          res.status(401).json({message: "An error has occured."});
+        } else {
+          res.status(401).json({message: "This quiz's time is over."});
+        }
+      });
+    } else {
+      let questions = []
+      for (var i in quiz.questions) {
+        let question = quiz.questions[i];
+        if (question.requirements) {
+          let answers = []
+          for (var j = 0; j < question.rightAnswers.length; j++) {
+            answers.push(question.rightAnswers[j])
+          }
+          for (var j = 0; j < question.wrongAnswers.length; j++) {
+            answers.push(question.wrongAnswers[j])
+          }
+          shuffle(answers);
+          let oneQuestion = {
+            _id: question._id,
+            requirements: question.requirements,
+            answers: answers
+          }
+          questions.push(oneQuestion)
+        }
+      }
+      let obfusatedQuiz = {
+        _id: quiz._id,
+        questions: questions,
+        timeToAnswer: quiz.timeToAnswer,
+        assignee: quiz.assignee
+      };
+      res.json(obfusatedQuiz);
+    }
+  });
 });
 
 // This route should mark the quiz with the given id as completed and compute the score for the quiz
@@ -67,6 +163,11 @@ router.post('/submit/:id', (req, res) => {
 });
 
 router.post('/create', (req, res) => {
+  const decoded = getPayload(req)
+  if (decoded.payload.role === "EXAMINEE") {
+    res.status(403).json({message: "You don't have access to that resource."});
+    return;
+  }
   Question.find({
     difficultyLevel: req.body.difficultyLevelId,
     technology: req.body.technologyId
@@ -117,7 +218,7 @@ router.post('/create', (req, res) => {
 
       const newQuiz = new Quiz({
         questions: quizQuestions,
-        timeToAnswer: req.body.timeToAnswer,
+        timeToAnswer: totalQuizTime,
         assignee: user
       });
 
