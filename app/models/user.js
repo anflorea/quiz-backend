@@ -45,8 +45,8 @@ const User = new Schema({
 });
 
 User.path('password').validate(function (v) {
-  return v.length > 5 && v.length < 15;
-}, 'Password must be between 5 and 15 characters!');
+  return v.length >= 3;
+}, 'Password must be between 3 and 15 characters!');
 
 User.pre('save', function (next) {
   var user = this;
